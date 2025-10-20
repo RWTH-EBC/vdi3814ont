@@ -1,0 +1,147 @@
+@prefix vdi3814: <http://www.vdi.de/3814#> .
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+#    Core Abstract Classes and Properties
+#################################################################
+
+# ------------------- Core Classes -------------------
+
+vdi3814:Function a owl:Class ;
+    rdfs:label "Function" ;
+    rdfs:comment "A controller function, representing a specific logic block or operation." .
+
+# ------------------- Core Properties -------------------
+
+vdi3814:Input a owl:ObjectProperty ;
+    rdfs:label "Input" ;
+    rdfs:comment "An abstract property representing an input to a controller function. The input is typically a Brick Point." ;
+    rdfs:domain vdi3814:Function ;
+    rdfs:range brick:Point .
+
+vdi3814:Output a owl:ObjectProperty ;
+    rdfs:label "Output" ;
+    rdfs:comment "An abstract property representing an output from a controller function. The output is typically a Brick Point." ;
+    rdfs:domain vdi3814:Function ;
+    rdfs:range brick:Point .
+
+vdi3814:Parameter a owl:DatatypeProperty ;
+    rdfs:label "Parameter" ;
+    rdfs:comment "An abstract property representing a configuration parameter of a controller function." ;
+    rdfs:domain vdi3814:Function ;
+    rdfs:range rdfs:Literal .
+
+
+#################################################################
+# SHACL Shapes for vdi3814 core properties
+#################################################################
+
+# 1) If vdi3814:Input is used, the subject must be a vdi3814:Function and the object a brick:Point
+vdi3814:InputPropertyShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf vdi3814:Input ;
+    sh:class vdi3814:Function ;
+    sh:property [
+        sh:path vdi3814:Input ;
+        sh:class brick:Point ;
+        sh:message "vdi3814:Input objects must be instances of brick:Point." ;
+    ] ;
+    sh:message "Subjects of vdi3814:Input must be instances of vdi3814:Function." .
+
+# 2) If vdi3814:Output is used, the subject must be a vdi3814:Function and the object a brick:Point
+vdi3814:OutputPropertyShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf vdi3814:Output ;
+    sh:class vdi3814:Function ;
+    sh:property [
+        sh:path vdi3814:Output ;
+        sh:class brick:Point ;
+        sh:message "vdi3814:Output objects must be instances of brick:Point." ;
+    ] ;
+    sh:message "Subjects of vdi3814:Output must be instances of vdi3814:Function." .
+
+# 3) If vdi3814:Parameter is used, the subject must be a vdi3814:Function and the object a Literal
+vdi3814:ParameterPropertyShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf vdi3814:Parameter ;
+    sh:class vdi3814:Function ;
+    sh:property [
+        sh:path vdi3814:Parameter ;
+        sh:nodeKind sh:Literal ;
+        sh:message "vdi3814:Parameter objects must be Literals." ;
+    ] ;
+    sh:message "Subjects of vdi3814:Parameter must be instances of vdi3814:Function." .
+
+#################################################################
+#    Specific Function Definitions
+#################################################################
+
+# -----------------------------------------------------------------
+#    PID Controller
+# -----------------------------------------------------------------
+
+vdi3814:PID a owl:Class ;
+    rdfs:label "PID Controller" ;
+    rdfs:comment "A Proportional-Integral-Derivative (PID) controller." ;
+    rdfs:subClassOf vdi3814:Function .
+
+vdi3814:setpoint a owl:ObjectProperty ;
+    rdfs:label "setpoint" ;
+    rdfs:comment "The desired setpoint value (w)." ;
+    rdfs:subPropertyOf vdi3814:Input ;
+    rdfs:domain vdi3814:PID ;
+    rdfs:range brick:Point .
+
+vdi3814:measurement a owl:ObjectProperty ;
+    rdfs:label "value" ;
+    rdfs:comment "The measured process variable (y)." ;
+    rdfs:subPropertyOf vdi3814:Input ;
+    rdfs:domain vdi3814:PID ;
+    rdfs:range brick:Point .
+
+vdi3814:kp a owl:DatatypeProperty ;
+    rdfs:label "kp" ;
+    rdfs:comment "Proportional gain for the PID controller." ;
+    rdfs:subPropertyOf vdi3814:Parameter ;
+    rdfs:domain vdi3814:PID ;
+    rdfs:range rdfs:Literal .
+
+vdi3814:ki a owl:DatatypeProperty ;
+    rdfs:label "ki" ;
+    rdfs:comment "Integral gain for the PID controller." ;
+    rdfs:subPropertyOf vdi3814:Parameter ;
+    rdfs:domain vdi3814:PID ;
+    rdfs:range rdfs:Literal .
+
+vdi3814:kd a owl:DatatypeProperty ;
+    rdfs:label "kd" ;
+    rdfs:comment "Derivative gain for the PID controller." ;
+    rdfs:subPropertyOf vdi3814:Parameter ;
+    rdfs:domain vdi3814:PID ;
+    rdfs:range rdfs:Literal .
+
+# -----------------------------------------------------------------
+#    Schedule Function
+# -----------------------------------------------------------------
+
+vdi3814:Schedule a owl:Class ;
+    rdfs:label "Schedule" ;
+    rdfs:comment "A schedule function that outputs a scheduled value based on a configured week range." ;
+    rdfs:subClassOf vdi3814:Function .
+
+# Parameter for Schedule (a subproperty of the abstract Parameter)
+vdi3814:week_range a owl:DatatypeProperty ;
+    rdfs:label "week_range" ;
+    rdfs:comment "A parameter encoding the active week range for the schedule (e.g., 'Mon–Fri 08:00–18:00')." ;
+    rdfs:subPropertyOf vdi3814:Parameter ;
+    rdfs:domain vdi3814:Schedule ;
+    rdfs:range rdfs:Literal .
+
+# -----------------------------------------------------------------
+#    Cant Publish more functions here due to copyright...
+# -----------------------------------------------------------------

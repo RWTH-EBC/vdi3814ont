@@ -1,0 +1,17 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix vdi3814: <http://www.vdi.de/3814#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[] a sh:ValidationReport ;
+    sh:conforms false ;
+    sh:result [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#PID_Bad> ;
+            sh:resultMessage "vdi3814:Parameter objects must be Literals." ;
+            sh:resultPath vdi3814:Parameter ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:NodeKindConstraintComponent ;
+            sh:sourceShape [ sh:message "vdi3814:Parameter objects must be Literals." ;
+                    sh:nodeKind sh:Literal ;
+                    sh:path vdi3814:Parameter ] ;
+            sh:value <http://example.org/inst#NotALiteral> ] .
+
