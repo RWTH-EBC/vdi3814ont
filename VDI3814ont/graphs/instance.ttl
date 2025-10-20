@@ -1,0 +1,77 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+@prefix vdi3814: <http://www.vdi.de/3814#> .
+@prefix ex: <http://example.org/inst#> .
+
+#################################################################
+# Example Brick points used by the conforming PID controllers
+#################################################################
+
+ex:Supply_Air_Temp_Setpoint a brick:Point ;
+    rdfs:label "Supply Air Temperature Setpoint" .
+
+ex:Supply_Air_Temp_Sensor a brick:Point ;
+    rdfs:label "Supply Air Temperature Sensor" .
+
+ex:Valve_Command a brick:Point ;
+    rdfs:label "Heating Valve Command" .
+
+ex:Zone_Temp_Setpoint a brick:Point ;
+    rdfs:label "Zone Temperature Setpoint" .
+
+ex:Zone_Temp_Sensor a brick:Point ;
+    rdfs:label "Zone Temperature Sensor" .
+
+ex:Damper_Command a brick:Point ;
+    rdfs:label "Economizer Damper Command" .
+
+#################################################################
+# Two conforming PID controller instances
+#################################################################
+
+# PID Controller 1: Heating valve control
+ex:PID_Heating a vdi3814:PID ;
+    rdfs:label "PID Heating Controller" ;
+    vdi3814:setpoint ex:Supply_Air_Temp_Setpoint ;
+    vdi3814:measurement ex:Supply_Air_Temp_Sensor ;
+    vdi3814:Output ex:Valve_Command ;
+    vdi3814:kp "2.5"^^xsd:decimal ;
+    vdi3814:ki "0.3"^^xsd:decimal ;
+    vdi3814:kd "0.1"^^xsd:decimal .
+
+# PID Controller 2: Economizer damper control
+ex:PID_Economizer a vdi3814:PID ;
+    rdfs:label "PID Economizer Controller" ;
+    vdi3814:setpoint ex:Zone_Temp_Setpoint ;
+    vdi3814:measurement ex:Zone_Temp_Sensor ;
+    vdi3814:Output ex:Damper_Command ;
+    vdi3814:kp "1.8"^^xsd:decimal ;
+    vdi3814:ki "0.25"^^xsd:decimal ;
+    vdi3814:kd "0.05"^^xsd:decimal .
+
+#################################################################
+# Intentionally NON-conforming PID controller
+#################################################################
+
+# A resource that is NOT a brick:Point (to break the Output object constraint)
+ex:Some_Device a brick:Equipment ;
+    rdfs:label "Some Non-Point Equipment" .
+
+# A resource used to break the Literal requirement for a Parameter
+ex:NotALiteral a brick:Point ;
+    rdfs:label "This is not a literal" .
+
+ex:PID_Bad a vdi3814:PID ;
+    rdfs:label "PID That Violates Shapes" ;
+    # setpoint/measurement are fine (Points), but:
+    vdi3814:setpoint ex:Supply_Air_Temp_Setpoint ;
+    vdi3814:measurement ex:Supply_Air_Temp_Sensor ;
+    # Violation 1: Output points to a non-Point (brick:Equipment)
+    vdi3814:Output ex:Some_Device ;
+    # Violation 2: kp is NOT a literal (object is a resource)
+    vdi3814:kp ex:NotALiteral ;
+    # ki/kd are omitted or could be literals; omission is fine unless you add SHACL minCount for these
+    vdi3814:kd "0.2"^^xsd:decimal .
