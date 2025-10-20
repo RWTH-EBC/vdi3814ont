@@ -15,7 +15,7 @@ This repository provides a compact RDF/OWL profile and SHACL validation setup to
 ### Illustration
 The diagram shows one concrete function instance (a PID) wired with inputs, an output value, and parameters—merely as an example of the general Function pattern.
 
-![PID example](docs/pid_example.png)
+![PID example](VDI3814ont/docs/pid_example.png)
 
 Notes
 You can add new function types by declaring a subclass of vdi3814:Function and introducing specialized subproperties of vdi3814:Input/Output/Parameter as needed. The SHACL rules will apply automatically.
