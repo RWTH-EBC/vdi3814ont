@@ -36,21 +36,21 @@ ex:Damper_Command a brick:Point ;
 ex:PID_Heating a vdi3814:PID ;
     rdfs:label "PID Heating Controller" ;
     vdi3814:setpoint ex:Supply_Air_Temp_Setpoint ;
-    vdi3814:measurement ex:Supply_Air_Temp_Sensor ;
-    vdi3814:Output ex:Valve_Command ;
-    vdi3814:kp "2.5"^^xsd:decimal ;
-    vdi3814:ki "0.3"^^xsd:decimal ;
-    vdi3814:kd "0.1"^^xsd:decimal .
+    vdi3814:current_value ex:Supply_Air_Temp_Sensor ;
+    vdi3814:output_value ex:Valve_Command ;
+    vdi3814:Kp "2.5"^^xsd:decimal ;
+    vdi3814:Ki "0.3"^^xsd:decimal ;
+    vdi3814:Kd "0.1"^^xsd:decimal .
 
 # PID Controller 2: Economizer damper control
 ex:PID_Economizer a vdi3814:PID ;
     rdfs:label "PID Economizer Controller" ;
     vdi3814:setpoint ex:Zone_Temp_Setpoint ;
-    vdi3814:measurement ex:Zone_Temp_Sensor ;
-    vdi3814:Output ex:Damper_Command ;
-    vdi3814:kp "1.8"^^xsd:decimal ;
-    vdi3814:ki "0.25"^^xsd:decimal ;
-    vdi3814:kd "0.05"^^xsd:decimal .
+    vdi3814:current_value ex:Zone_Temp_Sensor ;
+    vdi3814:output_value ex:Damper_Command ;
+    vdi3814:Kp "1.8"^^xsd:decimal ;
+    vdi3814:Ki "0.25"^^xsd:decimal ;
+    vdi3814:Kd "0.05"^^xsd:decimal .
 
 #################################################################
 # Intentionally NON-conforming PID controller
@@ -66,12 +66,12 @@ ex:NotALiteral a brick:Point ;
 
 ex:PID_Bad a vdi3814:PID ;
     rdfs:label "PID That Violates Shapes" ;
-    # setpoint/measurement are fine (Points), but:
+    # setpoint/current_value are fine (Points), but:
     vdi3814:setpoint ex:Supply_Air_Temp_Setpoint ;
-    vdi3814:measurement ex:Supply_Air_Temp_Sensor ;
-    # Violation 1: Output points to a non-Point (brick:Equipment)
-    vdi3814:Output ex:Some_Device ;
-    # Violation 2: kp is NOT a literal (object is a resource)
-    vdi3814:kp ex:NotALiteral ;
-    # ki/kd are omitted or could be literals; omission is fine unless you add SHACL minCount for these
-    vdi3814:kd "0.2"^^xsd:decimal .
+    vdi3814:current_value ex:Supply_Air_Temp_Sensor ;
+    # Violation 1: output_value points to a non-Point (brick:Equipment)
+    vdi3814:output_value ex:Some_Device ;
+    # Violation 2: Kp is NOT a literal (object is a resource)
+    vdi3814:Kp ex:NotALiteral ;
+    # Ki is omitted; omission is fine unless you add SHACL minCount for these
+    vdi3814:Kd "0.2"^^xsd:decimal .

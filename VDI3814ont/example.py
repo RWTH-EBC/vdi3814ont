@@ -14,6 +14,11 @@ def filter_by_namespace(g, ns_to_keep: rdflib.Namespace) -> Graph:
                 str(o).startswith(str(ns_to_keep))):
             filtered_graph.add((s, p, o))
 
+    nodes = set(filtered_graph.subjects()) | set(filtered_graph.objects())
+    for s, o in g.subject_objects(rdflib.RDF.type):
+        if s in nodes:
+            filtered_graph.add((s, rdflib.RDF.type, o))
+
     return filtered_graph
 
 

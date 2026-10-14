@@ -20,21 +20,15 @@ vdi3814:Function a owl:Class ;
 
 vdi3814:Input a owl:ObjectProperty ;
     rdfs:label "Input" ;
-    rdfs:comment "An abstract property representing an input to a controller function. The input is typically a Brick Point." ;
-    rdfs:domain vdi3814:Function ;
-    rdfs:range brick:Point .
+    rdfs:comment "An abstract property representing an input to a controller function. The input is typically a Brick Point." .
 
 vdi3814:Output a owl:ObjectProperty ;
     rdfs:label "Output" ;
-    rdfs:comment "An abstract property representing an output from a controller function. The output is typically a Brick Point." ;
-    rdfs:domain vdi3814:Function ;
-    rdfs:range brick:Point .
+    rdfs:comment "An abstract property representing an output from a controller function. The output is typically a Brick Point." .
 
 vdi3814:Parameter a owl:DatatypeProperty ;
     rdfs:label "Parameter" ;
-    rdfs:comment "An abstract property representing a configuration parameter of a controller function." ;
-    rdfs:domain vdi3814:Function ;
-    rdfs:range rdfs:Literal .
+    rdfs:comment "An abstract property representing a configuration parameter of a controller function." .
 
 
 #################################################################
@@ -93,37 +87,32 @@ vdi3814:PID a owl:Class ;
 vdi3814:setpoint a owl:ObjectProperty ;
     rdfs:label "setpoint" ;
     rdfs:comment "The desired setpoint value (w)." ;
-    rdfs:subPropertyOf vdi3814:Input ;
-    rdfs:domain vdi3814:PID ;
-    rdfs:range brick:Point .
+    rdfs:subPropertyOf vdi3814:Input .
 
-vdi3814:measurement a owl:ObjectProperty ;
-    rdfs:label "value" ;
+vdi3814:current_value a owl:ObjectProperty ;
+    rdfs:label "current_value" ;
     rdfs:comment "The measured process variable (y)." ;
-    rdfs:subPropertyOf vdi3814:Input ;
-    rdfs:domain vdi3814:PID ;
-    rdfs:range brick:Point .
+    rdfs:subPropertyOf vdi3814:Input .
 
-vdi3814:kp a owl:DatatypeProperty ;
-    rdfs:label "kp" ;
+vdi3814:output_value a owl:ObjectProperty ;
+    rdfs:label "output_value" ;
+    rdfs:comment "The manipulated variable (u) computed by the PID controller." ;
+    rdfs:subPropertyOf vdi3814:Output .
+
+vdi3814:Kp a owl:DatatypeProperty ;
+    rdfs:label "Kp" ;
     rdfs:comment "Proportional gain for the PID controller." ;
-    rdfs:subPropertyOf vdi3814:Parameter ;
-    rdfs:domain vdi3814:PID ;
-    rdfs:range rdfs:Literal .
+    rdfs:subPropertyOf vdi3814:Parameter .
 
-vdi3814:ki a owl:DatatypeProperty ;
-    rdfs:label "ki" ;
+vdi3814:Ki a owl:DatatypeProperty ;
+    rdfs:label "Ki" ;
     rdfs:comment "Integral gain for the PID controller." ;
-    rdfs:subPropertyOf vdi3814:Parameter ;
-    rdfs:domain vdi3814:PID ;
-    rdfs:range rdfs:Literal .
+    rdfs:subPropertyOf vdi3814:Parameter .
 
-vdi3814:kd a owl:DatatypeProperty ;
-    rdfs:label "kd" ;
+vdi3814:Kd a owl:DatatypeProperty ;
+    rdfs:label "Kd" ;
     rdfs:comment "Derivative gain for the PID controller." ;
-    rdfs:subPropertyOf vdi3814:Parameter ;
-    rdfs:domain vdi3814:PID ;
-    rdfs:range rdfs:Literal .
+    rdfs:subPropertyOf vdi3814:Parameter .
 
 # -----------------------------------------------------------------
 #    Schedule Function
@@ -138,9 +127,7 @@ vdi3814:Schedule a owl:Class ;
 vdi3814:week_range a owl:DatatypeProperty ;
     rdfs:label "week_range" ;
     rdfs:comment "A parameter encoding the active week range for the schedule (e.g., 'Mon–Fri 08:00–18:00')." ;
-    rdfs:subPropertyOf vdi3814:Parameter ;
-    rdfs:domain vdi3814:Schedule ;
-    rdfs:range rdfs:Literal .
+    rdfs:subPropertyOf vdi3814:Parameter .
 
 # -----------------------------------------------------------------
 #    Cant Publish more functions here due to copyright...
