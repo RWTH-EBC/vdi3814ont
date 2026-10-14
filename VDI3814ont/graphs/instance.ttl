@@ -3,7 +3,7 @@
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix brick: <https://brickschema.org/schema/Brick#> .
-@prefix vdi3814: <http://www.vdi.de/3814#> .
+@prefix vdi3814: <https://w3id.org/vdi3814ont#> .
 @prefix ex: <http://example.org/inst#> .
 
 #################################################################

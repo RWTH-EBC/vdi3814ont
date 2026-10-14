@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     # reason the data graph with OWL RL
     reasoned = reason_with_owlrl(shacl_graph + data_graph)
-    reasoned = filter_by_namespace(reasoned, rdflib.Namespace("http://www.vdi.de/3814#"))
+    reasoned = filter_by_namespace(reasoned, rdflib.Namespace("https://w3id.org/vdi3814ont#"))
 
     # validate the reasoned graph against the SHACL shapes
     confirms, results_graph, results_text = validate_with_pyshacl(shacl_graph, reasoned)

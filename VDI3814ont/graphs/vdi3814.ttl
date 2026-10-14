@@ -1,4 +1,4 @@
-@prefix vdi3814: <http://www.vdi.de/3814#> .
+@prefix vdi3814: <https://w3id.org/vdi3814ont#> .
 @prefix brick: <https://brickschema.org/schema/Brick#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .

@@ -1,6 +1,6 @@
 @prefix brick: <https://brickschema.org/schema/Brick#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix vdi3814: <http://www.vdi.de/3814#> .
+@prefix vdi3814: <https://w3id.org/vdi3814ont#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 [] a sh:ValidationReport ;
