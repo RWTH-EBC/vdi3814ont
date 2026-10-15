@@ -36,21 +36,21 @@ ex:Damper_Command a brick:Point ;
 ex:PID_Heating a vdi3814:PID ;
     rdfs:label "PID Heating Controller" ;
     vdi3814:setpoint ex:Supply_Air_Temp_Setpoint ;
-    vdi3814:current_value ex:Supply_Air_Temp_Sensor ;
-    vdi3814:output_value ex:Valve_Command ;
-    vdi3814:Kp "2.5"^^xsd:decimal ;
-    vdi3814:Ki "0.3"^^xsd:decimal ;
-    vdi3814:Kd "0.1"^^xsd:decimal .
+    vdi3814:measurement ex:Supply_Air_Temp_Sensor ;
+    vdi3814:output ex:Valve_Command ;
+    vdi3814:kp "2.5"^^xsd:decimal ;
+    vdi3814:ki "0.3"^^xsd:decimal ;
+    vdi3814:kd "0.1"^^xsd:decimal .
 
 # PID Controller 2: Economizer damper control
 ex:PID_Economizer a vdi3814:PID ;
     rdfs:label "PID Economizer Controller" ;
     vdi3814:setpoint ex:Zone_Temp_Setpoint ;
-    vdi3814:current_value ex:Zone_Temp_Sensor ;
-    vdi3814:output_value ex:Damper_Command ;
-    vdi3814:Kp "1.8"^^xsd:decimal ;
-    vdi3814:Ki "0.25"^^xsd:decimal ;
-    vdi3814:Kd "0.05"^^xsd:decimal .
+    vdi3814:measurement ex:Zone_Temp_Sensor ;
+    vdi3814:output ex:Damper_Command ;
+    vdi3814:kp "1.8"^^xsd:decimal ;
+    vdi3814:ki "0.25"^^xsd:decimal ;
+    vdi3814:kd "0.05"^^xsd:decimal .
 
 #################################################################
 # Intentionally NON-conforming PID controller
@@ -66,12 +66,182 @@ ex:NotALiteral a brick:Point ;
 
 ex:PID_Bad a vdi3814:PID ;
     rdfs:label "PID That Violates Shapes" ;
-    # setpoint/current_value are fine (Points), but:
+    # setpoint/measurement are fine (Points), but:
     vdi3814:setpoint ex:Supply_Air_Temp_Setpoint ;
-    vdi3814:current_value ex:Supply_Air_Temp_Sensor ;
-    # Violation 1: output_value points to a non-Point (brick:Equipment)
-    vdi3814:output_value ex:Some_Device ;
-    # Violation 2: Kp is NOT a literal (object is a resource)
-    vdi3814:Kp ex:NotALiteral ;
-    # Ki is omitted; omission is fine unless you add SHACL minCount for these
-    vdi3814:Kd "0.2"^^xsd:decimal .
+    vdi3814:measurement ex:Supply_Air_Temp_Sensor ;
+    # Violation 1: output points to a non-Point (brick:Equipment)
+    vdi3814:output ex:Some_Device ;
+    # Violation 2: kp is NOT a literal (object is a resource)
+    vdi3814:kp ex:NotALiteral ;
+    # ki is omitted; omission is fine unless you add SHACL minCount for these
+    vdi3814:kd "0.2"^^xsd:decimal .
+
+#################################################################
+# Further Brick points (use case 2: rooms, AHU, mixing circuit)
+#################################################################
+
+ex:Room_Temp_Sensor a brick:Point ;
+    rdfs:label "Room Temperature Sensor" .
+
+ex:Room_Min_Temp_Setpoint a brick:Point ;
+    rdfs:label "Room Minimum Air Temperature Setpoint" .
+
+ex:Radiator_Valve_Command a brick:Point ;
+    rdfs:label "Radiator Valve Command" .
+
+ex:Room_CO2_Sensor a brick:Point ;
+    rdfs:label "Room CO2 Sensor" .
+
+ex:ATB_01_Damper_Command a brick:Point ;
+    rdfs:label "Terminal Box 01 Damper Command" .
+
+ex:ATB_02_Damper_Command a brick:Point ;
+    rdfs:label "Terminal Box 02 Damper Command" .
+
+ex:Room_Occupancy_Sensor a brick:Point ;
+    rdfs:label "Room Occupancy Sensor" .
+
+ex:AHU_Fan_Speed_Command a brick:Point ;
+    rdfs:label "AHU Supply Fan Speed Command" .
+
+ex:AHU_SAT_Setpoint a brick:Point ;
+    rdfs:label "AHU Supply Air Temperature Setpoint" .
+
+ex:Outside_Air_Temp_Sensor a brick:Point ;
+    rdfs:label "Outside Air Temperature Sensor" .
+
+ex:Supply_Water_Temp_Setpoint a brick:Point ;
+    rdfs:label "Mixing Circuit Supply Water Temperature Setpoint" .
+
+ex:Supply_Water_Temp_Sensor a brick:Point ;
+    rdfs:label "Mixing Circuit Supply Water Temperature Sensor" .
+
+ex:Mixing_Valve_Command a brick:Point ;
+    rdfs:label "Mixing Valve Command" .
+
+ex:Pump_Speed_Command a brick:Point ;
+    rdfs:label "Circulation Pump Speed Command" .
+
+#################################################################
+# Conforming instances of the extended functions
+#################################################################
+
+# PID with output and integral limits (radiator valve)
+ex:PID_Radiator a vdi3814:PID ;
+    rdfs:label "PID Controller for Radiator 02.10" ;
+    vdi3814:setpoint ex:Room_Min_Temp_Setpoint ;
+    vdi3814:measurement ex:Room_Temp_Sensor ;
+    vdi3814:output ex:Radiator_Valve_Command ;
+    vdi3814:kp "2.5"^^xsd:float ;
+    vdi3814:ki "0.0015"^^xsd:float ;
+    vdi3814:kd "0.0"^^xsd:float ;
+    vdi3814:lowerLimit "0.0"^^xsd:float ;
+    vdi3814:upperLimit "1.0"^^xsd:float .
+
+# Reverse-acting CO2 PID without setpoint point -> uses defaultSetpoint; enabled by occupancy
+ex:PID_CO2 a vdi3814:PID ;
+    rdfs:label "CO2 PID Controller for Room 02.05" ;
+    vdi3814:defaultSetpoint "800.0"^^xsd:float ;
+    vdi3814:measurement ex:Room_CO2_Sensor ;
+    vdi3814:output ex:ATB_01_Damper_Command ;
+    vdi3814:release ex:Room_Occupancy_Sensor ;
+    vdi3814:reverseActing true ;
+    vdi3814:kp "0.05"^^xsd:float ;
+    vdi3814:ki "0.0001"^^xsd:float ;
+    vdi3814:kd "0.0"^^xsd:float ;
+    vdi3814:lowerLimit "0.1"^^xsd:float ;
+    vdi3814:upperLimit "1.0"^^xsd:float ;
+    vdi3814:lowerIntegralLimit "-500"^^xsd:float ;
+    vdi3814:upperIntegralLimit "500"^^xsd:float .
+
+# Room heating schedule with night setback
+ex:Schedule_Room a vdi3814:Schedule ;
+    rdfs:label "Heating Schedule for Room 02.10" ;
+    vdi3814:weekSchedule """[
+        [('06:00', 21.0), ('22:00', 19.0)],
+        [('06:00', 21.0), ('22:00', 19.0)],
+        [('06:00', 21.0), ('22:00', 19.0)],
+        [('06:00', 21.0), ('22:00', 19.0)],
+        [('06:00', 21.0), ('22:00', 19.0)],
+        [('00:00', 19.0)],
+        [('00:00', 19.0)]
+    ]"""^^xsd:string ;
+    vdi3814:dateRange "(01-01, 12-31)"^^xsd:string ;
+    vdi3814:output ex:Room_Min_Temp_Setpoint .
+
+# Seasonal pump schedule (winter, wraps around the turn of the year)
+ex:Schedule_Pump_Winter a vdi3814:Schedule ;
+    rdfs:label "Winter Schedule (90%) for Pump" ;
+    vdi3814:weekSchedule "[[('00:00', 90.0)], [('00:00', 90.0)], [('00:00', 90.0)], [('00:00', 90.0)], [('00:00', 90.0)], [('00:00', 90.0)], [('00:00', 90.0)]]"^^xsd:string ;
+    vdi3814:dateRange "(10-01, 04-30)"^^xsd:string ;
+    vdi3814:output ex:Pump_Speed_Command .
+
+# Weather-compensated heating curve
+ex:HeatingCurve_Mixing a vdi3814:HeatingCurve ;
+    rdfs:label "Weather Heating Curve for Mixing Valve" ;
+    vdi3814:input ex:Outside_Air_Temp_Sensor ;
+    vdi3814:output ex:Supply_Water_Temp_Setpoint ;
+    vdi3814:parameter "[(-10, 60.0), (0, 50.0), (10, 40.0), (20, 20.0)]"^^xsd:string ;
+    vdi3814:lowerLimit "20.0"^^xsd:float ;
+    vdi3814:upperLimit "60.0"^^xsd:float .
+
+# Trim and respond for the AHU supply fan
+ex:TrimAndRespond_AHU a vdi3814:TrimAndRespond ;
+    rdfs:label "Trim & Respond Fan Control for AHU 02" ;
+    vdi3814:input ex:ATB_01_Damper_Command , ex:ATB_02_Damper_Command ;
+    vdi3814:output ex:AHU_Fan_Speed_Command ;
+    vdi3814:lowerThreshold "0.70"^^xsd:float ;
+    vdi3814:upperThreshold "0.95"^^xsd:float ;
+    vdi3814:trimStep "0.02"^^xsd:float ;
+    vdi3814:respondStep "0.05"^^xsd:float ;
+    vdi3814:initialValue "0.5"^^xsd:float ;
+    vdi3814:timeStep "120"^^xsd:float ;
+    vdi3814:lowerLimit "0.2"^^xsd:float ;
+    vdi3814:upperLimit "1.0"^^xsd:float .
+
+#################################################################
+# Intentionally NON-conforming instances of the extended functions
+#################################################################
+
+ex:PID_Bad_Extended a vdi3814:PID ;
+    rdfs:label "PID Without Setpoint" ;
+    # Violation: neither setpoint nor defaultSetpoint
+    vdi3814:measurement ex:Supply_Water_Temp_Sensor ;
+    vdi3814:output ex:Mixing_Valve_Command ;
+    # Violation: reverseActing is not a boolean
+    vdi3814:reverseActing "yes" ;
+    # Violation: lowerLimit > upperLimit
+    vdi3814:lowerLimit "1.0"^^xsd:float ;
+    vdi3814:upperLimit "0.0"^^xsd:float .
+
+ex:Schedule_Bad a vdi3814:Schedule ;
+    rdfs:label "Schedule With Malformed Date Range And No Output" ;
+    vdi3814:weekSchedule "[[('00:00', 0.0)]]"^^xsd:string ;
+    # Violation: dateRange does not match "(MM-DD, MM-DD)"
+    vdi3814:dateRange "May to September"^^xsd:string .
+    # Violation: output missing
+
+ex:HeatingCurve_Bad a vdi3814:HeatingCurve ;
+    rdfs:label "Heating Curve Without Outdoor Temperature" ;
+    # Violation: input (outdoor air temperature) missing
+    vdi3814:output ex:Supply_Water_Temp_Setpoint ;
+    # Violation: parameter (support points) is not a list of pairs
+    vdi3814:parameter "60 at -10, 20 at 20"^^xsd:string .
+
+ex:TrimAndRespond_Bad a vdi3814:TrimAndRespond ;
+    rdfs:label "Trim & Respond With Swapped Thresholds" ;
+    # Violation: no input
+    vdi3814:output ex:AHU_Fan_Speed_Command ;
+    # Violation: lowerThreshold >= upperThreshold
+    vdi3814:lowerThreshold "0.95"^^xsd:float ;
+    vdi3814:upperThreshold "0.70"^^xsd:float ;
+    # Violation: trimStep must be positive
+    vdi3814:trimStep "-0.02"^^xsd:float .
+
+ex:PID_Bad_Release a vdi3814:PID ;
+    rdfs:label "PID With Two Release Inputs" ;
+    vdi3814:setpoint ex:Zone_Temp_Setpoint ;
+    vdi3814:measurement ex:Zone_Temp_Sensor ;
+    vdi3814:output ex:Damper_Command ;
+    # Violation: more than one release input
+    vdi3814:release ex:Room_Occupancy_Sensor , ex:Room_CO2_Sensor .

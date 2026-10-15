@@ -18,58 +18,114 @@ vdi3814:Function a owl:Class ;
 
 # ------------------- Core Properties -------------------
 
-vdi3814:Input a owl:ObjectProperty ;
-    rdfs:label "Input" ;
-    rdfs:comment "An abstract property representing an input to a controller function. The input is typically a Brick Point." .
+vdi3814:input a owl:ObjectProperty ;
+    rdfs:label "input" ;
+    rdfs:comment "An input to a controller function. The input is typically a Brick Point. Functions without a dedicated input role (e.g. the outdoor temperature of a heating curve or the requests of a trim and respond function) use this property directly." .
 
-vdi3814:Output a owl:ObjectProperty ;
-    rdfs:label "Output" ;
-    rdfs:comment "An abstract property representing an output from a controller function. The output is typically a Brick Point." .
+vdi3814:output a owl:ObjectProperty ;
+    rdfs:label "output" ;
+    rdfs:comment "The value computed by a controller function, e.g. the manipulated variable (u) of a PID controller, the scheduled value of a schedule, or the setpoint computed by a heating curve. The output is typically a Brick Point." .
 
-vdi3814:Parameter a owl:DatatypeProperty ;
-    rdfs:label "Parameter" ;
-    rdfs:comment "An abstract property representing a configuration parameter of a controller function." .
+vdi3814:parameter a owl:DatatypeProperty ;
+    rdfs:label "parameter" ;
+    rdfs:comment "A configuration parameter of a controller function. Functions without a dedicated parameter (e.g. the support points of a heating curve) use this property directly." .
+
+# ------------------- Shared Properties -------------------
+# Properties that are used by more than one specific function.
+
+vdi3814:release a owl:ObjectProperty ;
+    rdfs:label "release" ;
+    rdfs:comment "Optional enable input of a function, e.g. an occupancy sensor. The function is active while the release signal is true (or non-zero); otherwise its output is not updated by the function." ;
+    rdfs:subPropertyOf vdi3814:input .
+
+vdi3814:lowerLimit a owl:DatatypeProperty ;
+    rdfs:label "lowerLimit" ;
+    rdfs:comment "Lower bound of the output value of a function." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:upperLimit a owl:DatatypeProperty ;
+    rdfs:label "upperLimit" ;
+    rdfs:comment "Upper bound of the output value of a function." ;
+    rdfs:subPropertyOf vdi3814:parameter .
 
 
 #################################################################
 # SHACL Shapes for vdi3814 core properties
 #################################################################
 
-# 1) If vdi3814:Input is used, the subject must be a vdi3814:Function and the object a brick:Point
+# 1) If vdi3814:input is used, the subject must be a vdi3814:Function and the object a brick:Point
 vdi3814:InputPropertyShape
     a sh:NodeShape ;
-    sh:targetSubjectsOf vdi3814:Input ;
+    sh:targetSubjectsOf vdi3814:input ;
     sh:class vdi3814:Function ;
     sh:property [
-        sh:path vdi3814:Input ;
+        sh:path vdi3814:input ;
         sh:class brick:Point ;
-        sh:message "vdi3814:Input objects must be instances of brick:Point." ;
+        sh:message "vdi3814:input objects must be instances of brick:Point." ;
     ] ;
-    sh:message "Subjects of vdi3814:Input must be instances of vdi3814:Function." .
+    sh:message "Subjects of vdi3814:input must be instances of vdi3814:Function." .
 
-# 2) If vdi3814:Output is used, the subject must be a vdi3814:Function and the object a brick:Point
+# 2) If vdi3814:output is used, the subject must be a vdi3814:Function and the object a brick:Point
 vdi3814:OutputPropertyShape
     a sh:NodeShape ;
-    sh:targetSubjectsOf vdi3814:Output ;
+    sh:targetSubjectsOf vdi3814:output ;
     sh:class vdi3814:Function ;
     sh:property [
-        sh:path vdi3814:Output ;
+        sh:path vdi3814:output ;
         sh:class brick:Point ;
-        sh:message "vdi3814:Output objects must be instances of brick:Point." ;
+        sh:message "vdi3814:output objects must be instances of brick:Point." ;
     ] ;
-    sh:message "Subjects of vdi3814:Output must be instances of vdi3814:Function." .
+    sh:message "Subjects of vdi3814:output must be instances of vdi3814:Function." .
 
-# 3) If vdi3814:Parameter is used, the subject must be a vdi3814:Function and the object a Literal
+# 3) If vdi3814:parameter is used, the subject must be a vdi3814:Function and the object a Literal
 vdi3814:ParameterPropertyShape
     a sh:NodeShape ;
-    sh:targetSubjectsOf vdi3814:Parameter ;
+    sh:targetSubjectsOf vdi3814:parameter ;
     sh:class vdi3814:Function ;
     sh:property [
-        sh:path vdi3814:Parameter ;
+        sh:path vdi3814:parameter ;
         sh:nodeKind sh:Literal ;
-        sh:message "vdi3814:Parameter objects must be Literals." ;
+        sh:message "vdi3814:parameter objects must be Literals." ;
     ] ;
-    sh:message "Subjects of vdi3814:Parameter must be instances of vdi3814:Function." .
+    sh:message "Subjects of vdi3814:parameter must be instances of vdi3814:Function." .
+
+# 4) Reusable shape: a numeric literal (decimal, float, double or integer)
+vdi3814:NumericLiteralShape
+    a sh:NodeShape ;
+    sh:or (
+        [ sh:datatype xsd:decimal ]
+        [ sh:datatype xsd:float ]
+        [ sh:datatype xsd:double ]
+        [ sh:datatype xsd:integer ]
+    ) .
+
+# 5) Output limits: at most one value each, numeric, lower <= upper
+vdi3814:OutputLimitsShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf vdi3814:lowerLimit, vdi3814:upperLimit ;
+    sh:property [
+        sh:path vdi3814:lowerLimit ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:lessThanOrEquals vdi3814:upperLimit ;
+        sh:message "lowerLimit must be a single numeric literal that is not greater than upperLimit." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:upperLimit ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:message "upperLimit must be a single numeric literal." ;
+    ] .
+
+# 6) Release: at most one enable input per function
+vdi3814:ReleaseShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf vdi3814:release ;
+    sh:property [
+        sh:path vdi3814:release ;
+        sh:maxCount 1 ;
+        sh:message "A function has at most one release input." ;
+    ] .
 
 #################################################################
 #    Specific Function Definitions
@@ -87,32 +143,121 @@ vdi3814:PID a owl:Class ;
 vdi3814:setpoint a owl:ObjectProperty ;
     rdfs:label "setpoint" ;
     rdfs:comment "The desired setpoint value (w)." ;
-    rdfs:subPropertyOf vdi3814:Input .
+    rdfs:subPropertyOf vdi3814:input .
 
-vdi3814:current_value a owl:ObjectProperty ;
-    rdfs:label "current_value" ;
+vdi3814:measurement a owl:ObjectProperty ;
+    rdfs:label "measurement" ;
     rdfs:comment "The measured process variable (y)." ;
-    rdfs:subPropertyOf vdi3814:Input .
+    rdfs:subPropertyOf vdi3814:input .
 
-vdi3814:output_value a owl:ObjectProperty ;
-    rdfs:label "output_value" ;
-    rdfs:comment "The manipulated variable (u) computed by the PID controller." ;
-    rdfs:subPropertyOf vdi3814:Output .
+# The manipulated variable (u) is written to vdi3814:output.
 
-vdi3814:Kp a owl:DatatypeProperty ;
-    rdfs:label "Kp" ;
+vdi3814:kp a owl:DatatypeProperty ;
+    rdfs:label "kp" ;
     rdfs:comment "Proportional gain for the PID controller." ;
-    rdfs:subPropertyOf vdi3814:Parameter .
+    rdfs:subPropertyOf vdi3814:parameter .
 
-vdi3814:Ki a owl:DatatypeProperty ;
-    rdfs:label "Ki" ;
+vdi3814:ki a owl:DatatypeProperty ;
+    rdfs:label "ki" ;
     rdfs:comment "Integral gain for the PID controller." ;
-    rdfs:subPropertyOf vdi3814:Parameter .
+    rdfs:subPropertyOf vdi3814:parameter .
 
-vdi3814:Kd a owl:DatatypeProperty ;
-    rdfs:label "Kd" ;
+vdi3814:kd a owl:DatatypeProperty ;
+    rdfs:label "kd" ;
     rdfs:comment "Derivative gain for the PID controller." ;
-    rdfs:subPropertyOf vdi3814:Parameter .
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:defaultSetpoint a owl:DatatypeProperty ;
+    rdfs:label "defaultSetpoint" ;
+    rdfs:comment "Constant setpoint value used when no setpoint point is linked via vdi3814:setpoint." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:reverseActing a owl:DatatypeProperty ;
+    rdfs:label "reverseActing" ;
+    rdfs:comment "If true, the output increases when the measured value rises above the setpoint (e.g. a damper opening on rising CO2). Defaults to false (direct acting, e.g. a heating valve)." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:lowerIntegralLimit a owl:DatatypeProperty ;
+    rdfs:label "lowerIntegralLimit" ;
+    rdfs:comment "Lower bound of the integral term (anti-windup)." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:upperIntegralLimit a owl:DatatypeProperty ;
+    rdfs:label "upperIntegralLimit" ;
+    rdfs:comment "Upper bound of the integral term (anti-windup)." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+# Output limits: vdi3814:lowerLimit / vdi3814:upperLimit (shared properties, see above).
+
+vdi3814:PIDShape
+    a sh:NodeShape ;
+    sh:targetClass vdi3814:PID ;
+    # A setpoint is given either as a point or as a constant default value.
+    sh:or (
+        [ sh:path vdi3814:setpoint ; sh:minCount 1 ]
+        [ sh:path vdi3814:defaultSetpoint ; sh:minCount 1 ]
+    ) ;
+    sh:message "A PID controller needs a setpoint point (vdi3814:setpoint) or a constant vdi3814:defaultSetpoint." ;
+    sh:property [
+        sh:path vdi3814:setpoint ;
+        sh:maxCount 1 ;
+        sh:message "A PID controller has at most one setpoint." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:measurement ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A PID controller has exactly one measurement." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:output ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A PID controller has exactly one output." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:kp ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:message "kp must be a single numeric literal." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:ki ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:message "ki must be a single numeric literal." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:kd ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:message "kd must be a single numeric literal." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:defaultSetpoint ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:message "defaultSetpoint must be a single numeric literal." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:reverseActing ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "reverseActing must be a single xsd:boolean." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:lowerIntegralLimit ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:lessThanOrEquals vdi3814:upperIntegralLimit ;
+        sh:message "lowerIntegralLimit must be a single numeric literal that is not greater than upperIntegralLimit." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:upperIntegralLimit ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:message "upperIntegralLimit must be a single numeric literal." ;
+    ] .
 
 # -----------------------------------------------------------------
 #    Schedule Function
@@ -120,14 +265,179 @@ vdi3814:Kd a owl:DatatypeProperty ;
 
 vdi3814:Schedule a owl:Class ;
     rdfs:label "Schedule" ;
-    rdfs:comment "A schedule function that outputs a scheduled value based on a configured week range." ;
+    rdfs:comment "A schedule function that outputs a scheduled value based on a weekly switching profile and an active period of the year." ;
     rdfs:subClassOf vdi3814:Function .
 
-# Parameter for Schedule (a subproperty of the abstract Parameter)
-vdi3814:week_range a owl:DatatypeProperty ;
-    rdfs:label "week_range" ;
-    rdfs:comment "A parameter encoding the active week range for the schedule (e.g., 'Mon–Fri 08:00–18:00')." ;
-    rdfs:subPropertyOf vdi3814:Parameter .
+vdi3814:weekSchedule a owl:DatatypeProperty ;
+    rdfs:label "weekSchedule" ;
+    rdfs:comment "Weekly switching profile of the schedule: a list of seven days (Monday first), each a list of (time, value) pairs, e.g. \"[[('06:00', 21.0), ('22:00', 19.0)], ...]\". A value holds until the next switching time." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:dateRange a owl:DatatypeProperty ;
+    rdfs:label "dateRange" ;
+    rdfs:comment "Period of the year in which the schedule is active, given as \"(MM-DD, MM-DD)\". The period may wrap around the turn of the year, e.g. \"(10-01, 04-30)\" for a heating season." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+# The scheduled value is written to vdi3814:output.
+
+vdi3814:ScheduleShape
+    a sh:NodeShape ;
+    sh:targetClass vdi3814:Schedule ;
+    sh:property [
+        sh:path vdi3814:weekSchedule ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "A schedule has exactly one weekSchedule of type xsd:string." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:dateRange ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^\\(\\s*\\d{2}-\\d{2}\\s*,\\s*\\d{2}-\\d{2}\\s*\\)$" ;
+        sh:message "dateRange must be a single xsd:string of the form \"(MM-DD, MM-DD)\"." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:output ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A schedule has exactly one output." ;
+    ] .
+
+# -----------------------------------------------------------------
+#    Heating Curve Function
+# -----------------------------------------------------------------
+
+vdi3814:HeatingCurve a owl:Class ;
+    rdfs:label "Heating Curve" ;
+    rdfs:comment "A weather-compensated characteristic curve that computes a supply temperature setpoint (vdi3814:output) from the outdoor air temperature (vdi3814:input) by linear interpolation between support points. The support points are given in vdi3814:parameter as a list of (outdoor temperature, supply temperature) pairs in ascending order, e.g. \"[(-10, 60.0), (0, 50.0), (10, 40.0), (20, 20.0)]\". Outside this range the output is held at the first or last value." ;
+    rdfs:subClassOf vdi3814:Function .
+
+# Optional bounds: vdi3814:lowerLimit / vdi3814:upperLimit.
+
+vdi3814:HeatingCurveShape
+    a sh:NodeShape ;
+    sh:targetClass vdi3814:HeatingCurve ;
+    sh:property [
+        sh:path vdi3814:input ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A heating curve has exactly one input (outdoor air temperature)." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:output ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A heating curve has exactly one output." ;
+    ] ;
+    # After reasoning, sub-properties (e.g. lowerLimit) also appear as vdi3814:parameter,
+    # so only the string-valued support points are counted (qualified value shape).
+    sh:property [
+        sh:path vdi3814:parameter ;
+        sh:qualifiedValueShape [
+            sh:datatype xsd:string ;
+            sh:pattern "^\\s*\\[\\s*\\(.+\\)\\s*\\]\\s*$" ;
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:qualifiedMaxCount 1 ;
+        sh:message "A heating curve has exactly one parameter string with the support points \"[(x1, y1), (x2, y2), ...]\"." ;
+    ] .
+
+# -----------------------------------------------------------------
+#    Trim and Respond Function
+# -----------------------------------------------------------------
+
+vdi3814:TrimAndRespond a owl:Class ;
+    rdfs:label "Trim and Respond" ;
+    rdfs:comment "A reset function that adjusts a shared output (e.g. a supply fan speed) based on the most demanding of several inputs (e.g. the most open terminal box damper). In each time step, the output is increased by respondStep if the maximum input is above upperThreshold, decreased by trimStep if it is below lowerThreshold, and held otherwise. The requests are linked with vdi3814:input, the adjusted value with vdi3814:output." ;
+    rdfs:subClassOf vdi3814:Function .
+
+vdi3814:lowerThreshold a owl:DatatypeProperty ;
+    rdfs:label "lowerThreshold" ;
+    rdfs:comment "If the maximum input is below this value, the output is trimmed (e.g. 0.70)." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:upperThreshold a owl:DatatypeProperty ;
+    rdfs:label "upperThreshold" ;
+    rdfs:comment "If the maximum input is above this value, the output is increased (e.g. 0.95)." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:trimStep a owl:DatatypeProperty ;
+    rdfs:label "trimStep" ;
+    rdfs:comment "Amount by which the output is decreased per time step (positive value)." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:respondStep a owl:DatatypeProperty ;
+    rdfs:label "respondStep" ;
+    rdfs:comment "Amount by which the output is increased per time step (positive value)." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:initialValue a owl:DatatypeProperty ;
+    rdfs:label "initialValue" ;
+    rdfs:comment "Output value at start-up of the function." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+vdi3814:timeStep a owl:DatatypeProperty ;
+    rdfs:label "timeStep" ;
+    rdfs:comment "Interval between two trim or respond actions in seconds." ;
+    rdfs:subPropertyOf vdi3814:parameter .
+
+# Output bounds: vdi3814:lowerLimit / vdi3814:upperLimit.
+
+vdi3814:TrimAndRespondShape
+    a sh:NodeShape ;
+    sh:targetClass vdi3814:TrimAndRespond ;
+    sh:property [
+        sh:path vdi3814:input ;
+        sh:minCount 1 ;
+        sh:message "A trim and respond function has at least one input." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:output ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A trim and respond function has exactly one output." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:lowerThreshold ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:lessThan vdi3814:upperThreshold ;
+        sh:message "lowerThreshold must be a single numeric literal that is smaller than upperThreshold." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:upperThreshold ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:message "upperThreshold must be a single numeric literal." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:trimStep ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:minExclusive 0 ;
+        sh:message "trimStep must be a single positive numeric literal." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:respondStep ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:minExclusive 0 ;
+        sh:message "respondStep must be a single positive numeric literal." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:initialValue ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:message "initialValue must be a single numeric literal." ;
+    ] ;
+    sh:property [
+        sh:path vdi3814:timeStep ;
+        sh:maxCount 1 ;
+        sh:node vdi3814:NumericLiteralShape ;
+        sh:minExclusive 0 ;
+        sh:message "timeStep must be a single positive numeric literal." ;
+    ] .
 
 # -----------------------------------------------------------------
 #    Cant Publish more functions here due to copyright...
