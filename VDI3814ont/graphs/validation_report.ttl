@@ -6,30 +6,6 @@
 [] a sh:ValidationReport ;
     sh:conforms false ;
     sh:result [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#Schedule_Bad> ;
-            sh:resultMessage "dateRange must be a single xsd:string of the form \"(MM-DD, MM-DD)\"." ;
-            sh:resultPath vdi3814:dateRange ;
-            sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:PatternConstraintComponent ;
-            sh:sourceShape [ sh:datatype xsd:string ;
-                    sh:maxCount 1 ;
-                    sh:message "dateRange must be a single xsd:string of the form \"(MM-DD, MM-DD)\"." ;
-                    sh:path vdi3814:dateRange ;
-                    sh:pattern "^\\(\\s*\\d{2}-\\d{2}\\s*,\\s*\\d{2}-\\d{2}\\s*\\)$" ] ;
-            sh:value "May to September"^^xsd:string ],
-        [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#HeatingCurve_Bad> ;
-            sh:resultMessage "A heating curve has exactly one parameter string with the support points \"[(x1, y1), (x2, y2), ...]\"." ;
-            sh:resultPath vdi3814:parameter ;
-            sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
-            sh:sourceShape [ sh:message "A heating curve has exactly one parameter string with the support points \"[(x1, y1), (x2, y2), ...]\"." ;
-                    sh:path vdi3814:parameter ;
-                    sh:qualifiedMaxCount 1 ;
-                    sh:qualifiedMinCount 1 ;
-                    sh:qualifiedValueShape [ sh:datatype xsd:string ;
-                            sh:pattern "^\\s*\\[\\s*\\(.+\\)\\s*\\]\\s*$" ] ] ],
-        [ a sh:ValidationResult ;
             sh:detail [ a sh:ValidationResult ;
                     sh:focusNode <http://example.org/inst#NotALiteral> ;
                     sh:resultMessage "Node <http://example.org/inst#NotALiteral> must conform to one or more shapes in [ sh:datatype xsd:decimal ] , [ sh:datatype xsd:float ] , [ sh:datatype xsd:double ] , [ sh:datatype xsd:integer ]" ;
@@ -58,55 +34,6 @@
                     sh:path vdi3814:parameter ] ;
             sh:value <http://example.org/inst#NotALiteral> ],
         [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#PID_Bad_Extended> ;
-            sh:resultMessage "reverseActing must be a single xsd:boolean." ;
-            sh:resultPath vdi3814:reverseActing ;
-            sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
-            sh:sourceShape [ sh:datatype xsd:boolean ;
-                    sh:maxCount 1 ;
-                    sh:message "reverseActing must be a single xsd:boolean." ;
-                    sh:path vdi3814:reverseActing ] ;
-            sh:value "yes" ],
-        [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#PID_Bad_Extended> ;
-            sh:resultMessage "A PID controller needs a setpoint point (vdi3814:setpoint) or a constant vdi3814:defaultSetpoint." ;
-            sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:OrConstraintComponent ;
-            sh:sourceShape vdi3814:PIDShape ;
-            sh:value <http://example.org/inst#PID_Bad_Extended> ],
-        [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#PID_Bad_Release> ;
-            sh:resultMessage "A function has at most one release input." ;
-            sh:resultPath vdi3814:release ;
-            sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
-            sh:sourceShape [ sh:maxCount 1 ;
-                    sh:message "A function has at most one release input." ;
-                    sh:path vdi3814:release ] ],
-        [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#PID_Bad_Extended> ;
-            sh:resultMessage "lowerLimit must be a single numeric literal that is not greater than upperLimit." ;
-            sh:resultPath vdi3814:lowerLimit ;
-            sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:LessThanOrEqualsConstraintComponent ;
-            sh:sourceShape [ sh:lessThanOrEquals vdi3814:upperLimit ;
-                    sh:maxCount 1 ;
-                    sh:message "lowerLimit must be a single numeric literal that is not greater than upperLimit." ;
-                    sh:node vdi3814:NumericLiteralShape ;
-                    sh:path vdi3814:lowerLimit ] ;
-            sh:value "1.0"^^xsd:float ],
-        [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#HeatingCurve_Bad> ;
-            sh:resultMessage "A heating curve has exactly one input (outdoor air temperature)." ;
-            sh:resultPath vdi3814:input ;
-            sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
-            sh:sourceShape [ sh:maxCount 1 ;
-                    sh:message "A heating curve has exactly one input (outdoor air temperature)." ;
-                    sh:minCount 1 ;
-                    sh:path vdi3814:input ] ],
-        [ a sh:ValidationResult ;
             sh:focusNode <http://example.org/inst#TrimAndRespond_Bad> ;
             sh:resultMessage "trimStep must be a single positive numeric literal." ;
             sh:resultPath vdi3814:trimStep ;
@@ -119,24 +46,12 @@
                     sh:path vdi3814:trimStep ] ;
             sh:value "-0.02"^^xsd:float ],
         [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#PID_Bad> ;
-            sh:resultMessage "vdi3814:output objects must be instances of brick:Point." ;
-            sh:resultPath vdi3814:output ;
+            sh:focusNode <http://example.org/inst#PID_Bad_Extended> ;
+            sh:resultMessage "A PID controller needs a setpoint point (vdi3814:setpoint) or a constant vdi3814:defaultSetpoint." ;
             sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:ClassConstraintComponent ;
-            sh:sourceShape [ sh:class brick:Point ;
-                    sh:message "vdi3814:output objects must be instances of brick:Point." ;
-                    sh:path vdi3814:output ] ;
-            sh:value <http://example.org/inst#Some_Device> ],
-        [ a sh:ValidationResult ;
-            sh:focusNode <http://example.org/inst#TrimAndRespond_Bad> ;
-            sh:resultMessage "A trim and respond function has at least one input." ;
-            sh:resultPath vdi3814:input ;
-            sh:resultSeverity sh:Violation ;
-            sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
-            sh:sourceShape [ sh:message "A trim and respond function has at least one input." ;
-                    sh:minCount 1 ;
-                    sh:path vdi3814:input ] ],
+            sh:sourceConstraintComponent sh:OrConstraintComponent ;
+            sh:sourceShape vdi3814:PIDShape ;
+            sh:value <http://example.org/inst#PID_Bad_Extended> ],
         [ a sh:ValidationResult ;
             sh:focusNode <http://example.org/inst#TrimAndRespond_Bad> ;
             sh:resultMessage "lowerThreshold must be a single numeric literal that is smaller than upperThreshold." ;
@@ -150,6 +65,18 @@
                     sh:path vdi3814:lowerThreshold ] ;
             sh:value "0.95"^^xsd:float ],
         [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#HeatingCurve_Bad> ;
+            sh:resultMessage "A heating curve has exactly one parameter string with the support points \"[(x1, y1), (x2, y2), ...]\"." ;
+            sh:resultPath vdi3814:parameter ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:QualifiedMinCountConstraintComponent ;
+            sh:sourceShape [ sh:message "A heating curve has exactly one parameter string with the support points \"[(x1, y1), (x2, y2), ...]\"." ;
+                    sh:path vdi3814:parameter ;
+                    sh:qualifiedMaxCount 1 ;
+                    sh:qualifiedMinCount 1 ;
+                    sh:qualifiedValueShape [ sh:datatype xsd:string ;
+                            sh:pattern "^\\s*\\[\\s*\\(.+\\)\\s*\\]\\s*$" ] ] ],
+        [ a sh:ValidationResult ;
             sh:focusNode <http://example.org/inst#Schedule_Bad> ;
             sh:resultMessage "A schedule has exactly one output." ;
             sh:resultPath vdi3814:output ;
@@ -158,5 +85,78 @@
             sh:sourceShape [ sh:maxCount 1 ;
                     sh:message "A schedule has exactly one output." ;
                     sh:minCount 1 ;
-                    sh:path vdi3814:output ] ] .
+                    sh:path vdi3814:output ] ],
+        [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#PID_Bad> ;
+            sh:resultMessage "vdi3814:output objects must be instances of brick:Point." ;
+            sh:resultPath vdi3814:output ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:ClassConstraintComponent ;
+            sh:sourceShape [ sh:class brick:Point ;
+                    sh:message "vdi3814:output objects must be instances of brick:Point." ;
+                    sh:path vdi3814:output ] ;
+            sh:value <http://example.org/inst#Some_Device> ],
+        [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#HeatingCurve_Bad> ;
+            sh:resultMessage "A heating curve has exactly one input (outdoor air temperature)." ;
+            sh:resultPath vdi3814:input ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
+            sh:sourceShape [ sh:maxCount 1 ;
+                    sh:message "A heating curve has exactly one input (outdoor air temperature)." ;
+                    sh:minCount 1 ;
+                    sh:path vdi3814:input ] ],
+        [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#TrimAndRespond_Bad> ;
+            sh:resultMessage "A trim and respond function has at least one input." ;
+            sh:resultPath vdi3814:input ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:MinCountConstraintComponent ;
+            sh:sourceShape [ sh:message "A trim and respond function has at least one input." ;
+                    sh:minCount 1 ;
+                    sh:path vdi3814:input ] ],
+        [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#Schedule_Bad> ;
+            sh:resultMessage "dateRange must be a single xsd:string of the form \"(MM-DD, MM-DD)\"." ;
+            sh:resultPath vdi3814:dateRange ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:PatternConstraintComponent ;
+            sh:sourceShape [ sh:datatype xsd:string ;
+                    sh:maxCount 1 ;
+                    sh:message "dateRange must be a single xsd:string of the form \"(MM-DD, MM-DD)\"." ;
+                    sh:path vdi3814:dateRange ;
+                    sh:pattern "^\\(\\s*\\d{2}-\\d{2}\\s*,\\s*\\d{2}-\\d{2}\\s*\\)$" ] ;
+            sh:value "May to September"^^xsd:string ],
+        [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#PID_Bad_Release> ;
+            sh:resultMessage "A function has at most one release input." ;
+            sh:resultPath vdi3814:release ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:MaxCountConstraintComponent ;
+            sh:sourceShape [ sh:maxCount 1 ;
+                    sh:message "A function has at most one release input." ;
+                    sh:path vdi3814:release ] ],
+        [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#PID_Bad_Extended> ;
+            sh:resultMessage "reverseActing must be a single xsd:boolean." ;
+            sh:resultPath vdi3814:reverseActing ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:DatatypeConstraintComponent ;
+            sh:sourceShape [ sh:datatype xsd:boolean ;
+                    sh:maxCount 1 ;
+                    sh:message "reverseActing must be a single xsd:boolean." ;
+                    sh:path vdi3814:reverseActing ] ;
+            sh:value "yes" ],
+        [ a sh:ValidationResult ;
+            sh:focusNode <http://example.org/inst#PID_Bad_Extended> ;
+            sh:resultMessage "lowerLimit must be a single numeric literal that is not greater than upperLimit." ;
+            sh:resultPath vdi3814:lowerLimit ;
+            sh:resultSeverity sh:Violation ;
+            sh:sourceConstraintComponent sh:LessThanOrEqualsConstraintComponent ;
+            sh:sourceShape [ sh:lessThanOrEquals vdi3814:upperLimit ;
+                    sh:maxCount 1 ;
+                    sh:message "lowerLimit must be a single numeric literal that is not greater than upperLimit." ;
+                    sh:node vdi3814:NumericLiteralShape ;
+                    sh:path vdi3814:lowerLimit ] ;
+            sh:value "1.0"^^xsd:float ] .
 
